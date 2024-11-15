@@ -1,163 +1,132 @@
 # FunctionsAndErrors - A Metacrafters Project for ETH + AVAX Proof
 
-This project is a simple Health Monitoring contract that demonstrates the use of `require()`, `assert()`, and `revert()` statements.
+This Solidity project demonstrates the use of `require()`, `assert()`, and `revert()` statements through a personal health monitoring system deployed on the Ethereum blockchain.
+
+---
 
 ## Description
 
-The project simulates a personal health monitoring system on the Ethereum blockchain. Users can:
-- Log their distance traveled (in kilometers).
-- Record carbohydrate intake (in grams).
-- Track steps taken.
-- Retrieve and reset their health records.
+The **FunctionsAndErrors** contract allows users to log and manage their health data securely. Key features include:
 
-The contract includes checks to ensure valid data input and the integrity of the stored health data.
+- Setting user profiles with name, age, and sex.
+- Tracking distance traveled (in kilometers), carbohydrate intake (in grams), and steps taken.
+- Retrieving and resetting health records.
+- Estimating calories burned and weight lost based on walking duration and body weight.
+
+Error-handling mechanisms ensure data integrity and proper input validation.
+
+---
+
+## Features and Functions
+
+### User Profile
+- **`setUser(string _name, uint _sex, uint _age)`**  
+  Sets the user's name, sex (`1` for male, `2` for female), and age.  
+  - Requires: 
+    - Non-empty name.  
+    - Valid sex (`1` or `2`).  
+    - Age must be 18 or older.  
+
+### Health Tracking
+- **`logDistance(uint _distance)`**  
+  Logs the distance traveled. Ensures the distance is greater than 0 km.
+
+- **`logCarbs(uint _carbs)`**  
+  Records carbohydrate intake. Ensures carbs are greater than 0 grams.
+
+- **`logSteps(uint _steps)`**  
+  Tracks steps taken. Ensures steps are greater than 0.
+
+### Reset and Retrieval
+- **`resetHealthRecord()`**  
+  Resets health records to zero. Reverts if all values are already zero.
+
+- **`getHealthRecord()`**  
+  Retrieves the user's health record, returning the name, distance, carbs, and steps.
+
+### Weight Loss Estimation
+- **`calcWeightLost(uint _walkTime, uint _weight)`**  
+  Calculates calories burned and weight lost based on:
+  - Walk duration (minutes).
+  - Body weight (kg).
+  - MET values based on sex (`4` for males, `3` for females).  
+
+---
 
 ## Getting Started
 
-### Installing
+### Installation
 
-1. Install [Node.js](https://nodejs.org)
+1. **Install Node.js**  
+   [Download Node.js](https://nodejs.org) from the official site and follow the installation instructions.
 
-   Download and install from the official site.
-
-2. Install [Truffle](https://github.com/trufflesuite/truffle)
-
+2. **Install Truffle**  
+   Install Truffle globally:  
    ```bash
    npm install -g truffle
    ```
 
-### Executing Program
+---
 
-To run this program, use the Gitpod tools provided by Metacrafters or any local blockchain development environment.
+### Running the Contract
 
-## Initialize
-
-1. Initialize Truffle in your project folder:
-
+1. **Initialize Truffle**  
    ```bash
    truffle init
    ```
 
-   After initialization, you will find two folders: `contracts` for your Solidity files and `migrations` for deployment settings.
+2. **Add Contract**  
+   Save the `FunctionsAndErrors.sol` contract in the `contracts` directory.
 
-2. The "FunctionsAndErrors" contract
-
-   "FunctionsAndErrors.sol" in `contracts` contains the following code:
-
-   ```solidity
-   // SPDX-License-Identifier: MIT
-   pragma solidity ^0.8.18;
-
-   contract FunctionsAndErrors {
-       struct healthData {
-           string name;
-           uint distance; // km
-           uint carbs; // gm
-           uint steps;
-       }
-
-       mapping(address => healthData) private healthRecords;
-
-       function setName(string memory _name) public {
-           require(bytes(_name).length > 0, "Name cannot be empty");
-           healthRecords[msg.sender].name = _name;
-       }
-
-       function logDistance(uint _distance) public {
-           require(_distance > 0, "Distance must be greater than 0 kilometers");
-           uint previousDistance = healthRecords[msg.sender].distance;
-           healthRecords[msg.sender].distance += _distance;
-           assert(healthRecords[msg.sender].distance == previousDistance + _distance);
-       }
-
-       function logCarbs(uint _carbs) public {
-           require(_carbs > 0, "Carbohydrate intake must be greater than 0 grams");
-           uint previousCarbs = healthRecords[msg.sender].carbs;
-           healthRecords[msg.sender].carbs += _carbs;
-           assert(healthRecords[msg.sender].carbs == previousCarbs + _carbs);
-       }
-
-       function logSteps(uint _steps) public {
-           require(_steps > 0, "Steps must be greater than 0");
-           uint previousSteps = healthRecords[msg.sender].steps;
-           healthRecords[msg.sender].steps += _steps;
-           assert(healthRecords[msg.sender].steps == previousSteps + _steps);
-       }
-
-       function resetHealthRecord() public {
-           healthData storage data = healthRecords[msg.sender];
-           if (data.distance == 0 && data.carbs == 0 && data.steps == 0) {
-               revert("Records are already reset.");
-           }
-           data.distance = 0;
-           data.carbs = 0;
-           data.steps = 0;
-       }
-
-       function getHealthRecord() public view returns (string memory, uint, uint, uint) {
-           healthData memory data = healthRecords[msg.sender];
-           return (data.name, data.distance, data.carbs, data.steps);
-       }
-   }
-   ```
-
-3. Prepare the Migration
-
-   Create "2_deploy_functions_and_errors.js" in `migrations` with the following code:
-
+3. **Create Migration File**  
+   Add `2_deploy_functions_and_errors.js` in the `migrations` folder:  
    ```javascript
    const FunctionsAndErrors = artifacts.require("FunctionsAndErrors");
 
    module.exports = function (deployer) {
-     deployer.deploy(FunctionsAndErrors);
+       deployer.deploy(FunctionsAndErrors);
    };
    ```
 
-4. Start Truffle Console in Development Mode
-
+4. **Compile and Deploy**  
+   Use Truffle's development environment to compile and deploy the contract:  
    ```bash
    truffle develop
-   ```
-
-   In the Truffle console, execute:
-
-   ```bash
    compile
-   migrate
+   migrate --reset
    ```
 
-   To remigrate existing contracts, use `migrate --reset` instead of simply `migrate`.
+---
 
-## Functions
+## Usage
 
-### `setName(string _name)`
-Sets the name of the user. Requires the name not to be empty.
+Deploy and interact with the contract using a blockchain development environment such as [Remix](https://remix.ethereum.org) or Truffle.  
 
-### `logDistance(uint _distance)`
-Logs the distance (in km) traveled by the user. Requires the distance to be greater than 0 and ensures data consistency.
+Example commands in Truffle console:
+```javascript
+// Set user profile
+await contractInstance.setUser("John Doe", 1, 25);
 
-### `logCarbs(uint _carbs)`
-Logs carbohydrate intake (in grams). Requires carbs to be greater than 0 and ensures data consistency.
+// Log activities
+await contractInstance.logDistance(5); // Add 5 km
+await contractInstance.logCarbs(100); // Add 100 grams of carbs
+await contractInstance.logSteps(2000); // Add 2000 steps
 
-### `logSteps(uint _steps)`
-Logs the number of steps taken. Requires steps to be greater than 0 and ensures data consistency.
+// Retrieve health record
+let record = await contractInstance.getHealthRecord();
+console.log(record);
+```
 
-### `resetHealthRecord()`
-Resets the user’s health records. Reverts if the records are already reset.
-
-### `getHealthRecord()`
-Returns the user’s health record, including:
-- Name
-- Distance
-- Carbs
-- Steps
+---
 
 ## Authors
 
-John Gabriel T. Pagtalunan  
-@202120016@fit.edu.ph  
-@j.g.pagtalunan14@gmail.com
+**John Gabriel T. Pagtalunan**  
+- **Email:** 202120016@fit.edu.ph  
+- **GitHub:** [John Pagtalunan](https://github.com/j.g.pagtalunan14)  
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.  

@@ -123,7 +123,7 @@ console.log(record);
 
 **John Gabriel T. Pagtalunan**  
 - **Email:** 202120016@fit.edu.ph  
-- **GitHub:** [John Pagtalunan](https://github.com/j.g.pagtalunan14)  
+- **GitHub:** [@SirJohnGabriel](https://github.com/SirJohnGabriel)  
 
 ---
 
